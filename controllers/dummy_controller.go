@@ -19,6 +19,7 @@ package controllers
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -51,14 +52,29 @@ type DummyReconciler struct {
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.14.1/pkg/reconcile
 func (r *DummyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	// TODO(user): your logic here
-	logger := ctrllog.FromContext(ctx)
+	log := ctrllog.FromContext(ctx)
 	dummy := &interviewcomv1alpha1.Dummy{}
 	err := r.Get(ctx, req.NamespacedName, dummy)
 
 	if err != nil {
-		logger.Info("There was an error")
+		if errors.IsNotFound(err) {
+			log.Info("Dummy resource not found. Ignoring since object must be deleted")
+			return ctrl.Result{}, nil
+		}
+		// Error reading the object - requeue the request.
+		log.Error(err, "Failed to get Dummy instance")
+		return ctrl.Result{}, err
 	} else {
-		logger.Info("RETRIEVED VALUES", "object name", dummy.Name, "object namespace", dummy.Namespace, "value of spec.message", dummy.Spec.Message)
+		log.Info("RETRIEVED VALUES", "object name", dummy.Name, "object namespace", dummy.Namespace, "value of spec.message", dummy.Spec.Message)
+
+		dummy.Status.SpecEcho = dummy.Spec.Message
+		err := r.Status().Update(ctx, dummy)
+		if err != nil {
+			log.Error(err, "Failed to update SpecEcho status")
+			return ctrl.Result{}, err
+		} else {
+			log.Info("Updated the SpecEcho status")
+		}
 	}
 
 	return ctrl.Result{}, nil

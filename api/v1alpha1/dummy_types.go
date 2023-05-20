@@ -32,13 +32,16 @@ type DummySpec struct {
 	// Foo string `json:"foo,omitempty"`
 
 	// String message of Dummy operator
-	Message string `json:"message"`
+	Message string `json:"message,omitempty"`
 }
 
 // DummyStatus defines the observed state of Dummy
 type DummyStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+
+	// a copy of spec.message
+	SpecEcho string `json:"specEcho,omitempty"`
 }
 
 //+kubebuilder:object:root=true

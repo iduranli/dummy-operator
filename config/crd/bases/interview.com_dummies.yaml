@@ -38,11 +38,13 @@ spec:
               message:
                 description: String message of Dummy operator
                 type: string
-            required:
-            - message
             type: object
           status:
             description: DummyStatus defines the observed state of Dummy
+            properties:
+              specEcho:
+                description: a copy of spec.message
+                type: string
             type: object
         type: object
     served: true
