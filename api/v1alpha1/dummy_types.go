@@ -20,6 +20,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const (
+	PodStatusPending = "Pending"
+	PodStatusRunning = "Running"
+)
+
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
@@ -40,8 +45,11 @@ type DummyStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// a copy of spec.message
+	// A copy(echo) of spec.message
 	SpecEcho string `json:"specEcho,omitempty"`
+
+	// Status of the Pod ["Running","Pending"]
+	PodStatus string `json:"podStatus,omitempty"`
 }
 
 //+kubebuilder:object:root=true

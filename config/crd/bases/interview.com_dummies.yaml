@@ -42,8 +42,11 @@ spec:
           status:
             description: DummyStatus defines the observed state of Dummy
             properties:
+              podStatus:
+                description: Status of the Pod ["Running","Pending"]
+                type: string
               specEcho:
-                description: a copy of spec.message
+                description: A copy(echo) of spec.message
                 type: string
             type: object
         type: object
