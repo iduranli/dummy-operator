@@ -11,7 +11,7 @@ metadata:
   namespace: default
 spec:
   # TODO(user): Add fields here
-  message: "I'm just a dummy!"
+  message: "I'm just a dummy"
 status:
-  specEcho: "I'm just a dummy"
+  specEcho: "None"
   podStatus: "None"
