@@ -1,0 +1,143 @@
+- kubernetes essentials on Youtube IBM Technology (https://www.youtube.com/playlist?list=PLOspHqNVtKABAVX4azqPIu6UfsPzSu2YN)
+
+- create linux installation in virtualbox (4GB ram, 40 GB HDD)
+
+- install git
+- install docker
+- install kubernetes
+- install minikube
+- install go
+- install operator-sdk
+- vscode
+
+- Deploying a Kubernetes Operator written in Golang on OVHcloud Managed Kubernetes
+  https://help.ovhcloud.com/csm/en-public-cloud-kubernetes-deploy-go-operator?id=kb_article_view&sysparm_article=KB0049790
+
+- Develop a simple operator to deploy a web application using the GO Operator SDK
+  https://suedbroecker.net/2022/02/18/start-to-develop-a-simple-operator-to-deploy-the-frontend-application-of-the-open-source-multi-cloud-asset-to-build-saas%C2%B6/
+  https://suedbroecker.net/2022/03/11/how-to-extend-a-custom-resource-definition-for-a-go-operator/
+
+  1. Generate an own Operator API using the GO SDK
+     Step 1: Create a project folder called frontendOperator
+        mkdir frontendOperator
+        cd frontendOperator
+     Step 2: Init a new operator project
+        operator-sdk init --domain example.net --repo github.com/thomassuedbroecker/multi-tenancy-frontend-operator
+     Step 3: Create a new Operator API
+        operator-sdk create api --group multitenancy --version v1alpha1 --kind TenancyFrontend --resource --controller
+     Step 4: Install missing components or version, if needed
+        go get k8s.io/client-go@latest
+  2. Get a basic understanding of some parts in the operator implementation with the GO SDK
+     2.1. Let’s start with the setup of the example on the local machine
+        Step 1: Create a new folder on you machine:
+           mkdir frontendOperator-git/
+           cd frontendOperator-git/
+        Step 2: Clone the operator code into the “example” folder:
+           git clone https://github.com/thomassuedbroecker/multi-tenancy-frontend-operator.git
+        Step 3: Navigate to the frontendOperator folder of the cloned project
+           cd multi-tenancy-frontend-operator/frontendOperator
+        Step 4: Add the folder frontendOperator to your Visual Studio Code workspace
+     2.2 Let’s understand the existing code of the project.
+        2.2.1 How to define content for a custom resource definition in the frontendOperator/api/v1alpha1/tenancyfrontend_type.go file
+        2.2.2 Understand a bit the controller
+        2.2.3 Remember the basics of the reconcile function
+           The reconcile function is responsible to ensure that the desired state of our operator will be achieved
+        2.2.4 Ensure that a container image is available for the deployment
+     2.3 How to define the deployments?
+        2.3.1 UNDERSTAND THE ACTUAL DEPLOYMENT OF THE FRONTEND APPLICATION
+        2.3.2 UNDERSTAND THE IMPLEMENTATION OF THE DEPLOYMENT DEFINITION
+
+
+- minikube start --driver=docker
+  add user to the docker group
+  minikube config set driver docker
+
+- for external ip address of the load balancer:
+  minikube tunnel
+
+- Assignment
+   1. Create repo dummy-operator in GitHub
+   2. Clone dummy-operator into local machine
+      git clone https://github.com/iduranli/dummy-operator.git
+   3. start minikube
+      minikube start --driver=docker
+      minikube status
+   4. initialize a kubernetes operator
+      operator-sdk init --project-name dummy-operator --domain interview.com --repo github.com/iduranli/dummy-operator
+   5. scaffold a kubernetes API with resource and controller
+      operator-sdk create api --version v1alpha1 --kind Dummy --resource --controller
+   6. generate CRD
+      make generate
+      make manifests
+   7. edit _v1alpha1_dummy.yaml and add message
+   8. edit dummy_types.go and add message to spec
+   9. edit dummy_controller.go
+  10. make generate
+  11. make manifests
+  12. Install the CRD and run the controller
+      make install run
+  13. modify _v1alpha1_dummy.yaml and run:
+      kubectl apply -f ./config/samples/_v1alpha1_dummy.yaml
+  14. get the status value
+      kubectl get dummy dummy-sample -o yaml
+  15. delete deployment
+      kubectl delete -n NAMESPACE deployment DEPLOYMENT
+      kubectl get all --all-namespaces
+  16. cleanup
+      kubectl delete -f config/samples/cache_v1alpha1_memcached.yaml
+      make undeploy
+  17. testing with minikube tunnel
+      minikube tunnel
+      run operator object
+      kubectl expose pod dummy-nginx --type=LoadBalancer --port=8080
+      kubectl get all --show-labels
+      connect to 127.0.0.1:8080 on browser
+  18. login to docker hub
+      docker login
+  19. create docker image
+      make docker-build IMG="iduranli/dummy-operator:v0.0.1"
+  20. push docker image
+      make docker-push IMG="iduranli/dummy-operator:v0.0.1"
+  21. pull docker image
+      docker pull  iduranli/dummy-operator:v0.0.1
+  22. run image in kubernetes
+      kubectl run dummy-operator --image iduranli/dummy-operator:v0.0.1
+  23. observe logs
+      kubectl logs dummy-operator --all-containers
+      kubectl logs -f dummy-operator -c dummy-operator
+
+kubectl create serviceaccount dummy-account
+kubectl get serviceaccounts
+kubectl create token dummy-account
+kubectl auth can-i --as=system:serviceaccount:default:default list pod
+kubectl apply -f service-account-default.yaml
+
+Kubectl Cheatsheet:
+   https://kubernetes.io/docs/reference/kubectl/cheatsheet/
+Howto set serviceaccount permissions for default
+   https://stackoverflow.com/questions/47973570/kubernetes-log-user-systemserviceaccountdefaultdefault-cannot-get-services
+Howto make docker image with operator-sdk
+   https://sdk.operatorframework.io/docs/building-operators/golang/quickstart/
+Build and push your Docker image with operator-sdk
+   https://developer.ibm.com/learningpaths/kubernetes-operators/develop-deploy-simple-operator/create-operator/
+Develop a simple operator to deploy a web application using the GO Operator SDK
+   https://suedbroecker.net/2022/02/18/start-to-develop-a-simple-operator-to-deploy-the-frontend-application-of-the-open-source-multi-cloud-asset-to-build-saas%C2%B6/
+Run NGINX on Kubernetes
+   https://nonanom.medium.com/run-nginx-on-kubernetes-ee6ea937bc99
+Go operator tutorial
+   https://sdk.operatorframework.io/docs/building-operators/golang/tutorial/
+Two easy ways to use local Docker images in Minikube
+   https://levelup.gitconnected.com/two-easy-ways-to-use-local-docker-images-in-minikube-cd4dcb1a5379
+Build a Kubernetes Operator in 10 minutes with Operator SDK
+   https://opensource.com/article/20/3/kubernetes-operator-sdk
+Creating a pod in operator-sdk
+   https://github.com/qdnqn/kubebuilder-operator
+Let’s create your first Kubernetes Operator with operator-sdk
+   https://nakamasato.medium.com/lets-create-your-first-kubernetes-operator-with-operator-sdk-8899567a4255
+Deploying a Kubernetes Operator written in Golang on OVHcloud Managed Kubernetes nginx
+   https://help.ovhcloud.com/csm/en-public-cloud-kubernetes-deploy-go-operator?id=kb_article_view&sysparm_article=KB0049790
+How to extend a Custom Resource Definition for a GO Operator?
+   https://suedbroecker.net/2022/03/11/how-to-extend-a-custom-resource-definition-for-a-go-operator/
+multi-tenancy-frontend-operator
+   https://github.com/thomassuedbroecker/multi-tenancy-frontend-operator
+
