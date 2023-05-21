@@ -25,7 +25,7 @@ Source code of dummy-operator is available in GitHub:
 
 ## **Docker Image** ##
 Docker image of dummy-operator is available in Docker Hub:
-- docker pull iduranli/dummy-operator:v0.0.1
+- docker pull iduranli/dummy-operator:v0.0.2
 
 # **Testing dummy-operator** #
 
@@ -45,16 +45,18 @@ Note: lines starting with "->" are command line executions.
 1. (terminal-1) Start minikube
     - -> minikube start --driver=docker
 2. (terminal-2) pull docker image
-    - -> docker pull  iduranli/dummy-operator:v0.0.1
-3. (terminal-2) service account "default" requires permissions to access objects within kubernetes. run the following yaml file to give access permissions
+    - -> docker pull  iduranli/dummy-operator:v0.0.2
+3. (terminal-2) service account "default" requires permissions to access objects within kubernetes. run the following yaml file to give access permissions, and verify permissions
     - -> curl -O https://raw.githubusercontent.com/iduranli/dummy-operator/main/config/samples/service-account-patch-for-default.yaml
     - -> kubectl apply -f service-account-patch-for-default.yaml
-4. (terminal-2) verify the permissions
     - -> kubectl auth can-i --as=system:serviceaccount:default:default list pod
     - result sould be yes
-5. (terminal-2) run the custom controller Dummy (wait for the initialization to complete)
-    - -> kubectl run dummy-operator --image iduranli/dummy-operator:v0.0.1
-6. (terminal-2) observe further logs
+4. (terminal-2) run the custom controller Dummy (wait for the initialization to complete)
+    - -> kubectl run dummy-operator --image iduranli/dummy-operator:v0.0.2
+5. (terminal-3) fetch _v1alpha1_dummy.yaml and apply
+    - -> curl -O https://raw.githubusercontent.com/iduranli/dummy-operator/main/config/samples/_v1alpha1_dummy.yaml
+    - -> kubectl apply -f _v1alpha1_dummy.yaml
+6. (terminal-2) observe logs
     - -> kubectl logs -f dummy-operator -c dummy-operator
     - "object name", "object namespace" and "spec.message" values are printed to screen
     - specEcho is updated with the value of "spec.message"
@@ -68,7 +70,7 @@ Note: lines starting with "->" are command line executions.
     - -> kubectl get all
     - a Pod exists with name dummy-nginx (and dummy-operator)
 9. (terminal-3) modify spec.message field in _v1alpha1_dummy.yaml and apply
-    - -> curl -O https://raw.githubusercontent.com/iduranli/dummy-operator/main/config/samples/_v1alpha1_dummy.yaml
+    - -> vim _v1alpha1_dummy.yaml
     - -> kubectl apply -f _v1alpha1_dummy.yaml
 10. (terminal-2) verify results in log
     - observe log for "object name", "object namespace" and "spec.message" values,
